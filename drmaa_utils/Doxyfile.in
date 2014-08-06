@@ -1,0 +1,30 @@
+PROJECT_NAME           = "@PACKAGE_NAME@"
+PROJECT_NUMBER         = @PACKAGE_VERSION@
+INPUT                  = @top_srcdir@/drmaa_utils
+EXCLUDE                = \
+ @top_srcdir@/drmaa_utils/datetime_tab.c \
+ @top_srcdir@/drmaa_utils/datetime_tab.h \
+ @top_srcdir@/drmaa_utils/conf_tab.c \
+ @top_srcdir@/drmaa_utils/conf_tab.h \
+ @top_srcdir@/drmaa_utils/drmaa_attrib.c
+OUTPUT_DIRECTORY       = apidoc
+
+ENABLE_PREPROCESSING   = YES
+PREDEFINED             = __GNUC__
+
+JAVADOC_AUTOBRIEF      = YES
+EXTRACT_ALL            = NO
+HIDE_UNDOC_MEMBERS     = NO
+SORT_BRIEF_DOCS        = NO
+SORT_MEMBER_DOCS       = NO
+DETAILS_AT_TOP         = YES
+OPTIMIZE_OUTPUT_FOR_C  = YES
+TAB_SIZE               = 2
+GENERATE_TODOLIST      = YES
+SHOW_DIRECTORIES       = NO
+
+HAVE_DOT               = @HAVE_DOT@
+CALL_GRAPH             = YES
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO

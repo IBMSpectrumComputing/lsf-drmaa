@@ -1,0 +1,119 @@
+FedStage DRMAA for LSF Release Notes
+
+====================================
+
+
+
+Changes in 1.1.1 release
+
+------------------------
+
+
+* This is an IBM Platform Computing fork of the original lsf-drmaa 
+  
+  which can be found at http://sourceforge.net/projects/lsf-drmaa/.
+
+
+
+* IBM Platform Computing will provide formal support for this software 
+  to entitled clients, via the normal IBM support channels.
+
+
+
+* Tested on LSF 9.1.2.
+
+
+
+
+Changes in 1.0.2 release
+
+------------------------
+
+
+ 
+* ``drmaa_remote_command`` and ``drmaa_v_argv`` are quoted and not interpreted 
+  by shell (e.g. spaces are allowed in command and
+ arguments). Jobs are created 
+  with ``exec`` command (i.e. unnecessary
+ shell process dangling for duration of 
+  job were eliminated
+
+ ).
+
+* ``drmaa_wifexited`` follows refinement on DRMAA Working Group mailing
+ list. 
+  Returns 1 only for exit statuses not greater than 128.
+ Previously it returned 1   for all jobs which were run (not aborted).
+
+ 
+
+* It has been reported that in some situations a job which was recently
+ submitted 
+  is not always immediately visible through the LSF API. There is
+ now workaround 
+  for such behaviour.
+
+ 
+
+* Bugfixes: Segfault when ``drmaa_v_argv`` is not set.
+ Native specification parsing bugs.  
+  Various other segfaults and
+  memory leaks fixed.
+
+
+
+
+Changes in 1.0.1 release
+
+------------------------
+
+ 
+
+* Many attributes implemented:
+
+   
+  - ``drmaa_start_time``,
+   
+  - ``drmaa_native_specification``,
+   
+  - ``drmaa_transfer_files``,
+   
+  - job limits.
+
+ 
+
+* Integrates with `FedStage Advance Reservation Library for LSF`_.
+
+ 
+
+* Job category now points to native specification string in configuration file instead of job group.
+
+ 
+
+* Thread safe design.
+
+
+ 
+* Configuration file(s).
+
+
+ 
+* Lots of bug fixes.
+
+ 
+
+* More robust code.
+
+
+ 
+* Meaningful logging, error messages and codes.
+
+
+.. _FedStage Advance Reservation Library for LSF:
+  
+  http://www.fedstage.com/wiki/AdvanceReservation
+
+.. vim700: spell spelllang=en
+.. 
+  vim: ft=rest
+.. vim: ts=2 sw=2 et

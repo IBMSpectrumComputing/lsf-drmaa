@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.8: http://docutils.sourceforge.net/" />
+<title>FedStage DRMAA for LSF</title>
+<meta name="author" content="Łukasz Cieśnik &lt;lukasz.ciesnik&#64;fedstage.com&gt;, Mariusz Mamoński &lt;mamonski&#64;man.poznan.pl&gt;" />
+<meta name="organization" content="FedStage System, Poznan Supercomputing and Networking Center" />
+<meta name="date" content="2009-05-05" />
+<meta name="copyright" content="Copyright (C) 2007-2008 FedStage Systems, Copyright (C) 2009-2010 Poznan Supercomputing and Networking Center" />
+<meta content="en" http-equiv="Content-Language" />
+<meta content="application/xhtml+xml; charset=UTF-8" http-equiv="Content-Type" />
+<meta content="Distributed Resource Management Application API 1.0 implementation for Platform LSF" lang="en" name="description" />
+<meta content="DRMAA, Distributed Resource Management Application API, Platform LSF, FedStage Systems" name="keywords" />
+<link rel="stylesheet" href="stylesheet.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="fedstage-drmaa-for-lsf">
+<h1 class="title">FedStage DRMAA for LSF</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Author:</th>
+<td>Łukasz Cieśnik &lt;<a class="reference external" href="mailto:lukasz.ciesnik&#64;fedstage.com">lukasz.ciesnik&#64;fedstage.com</a>&gt;, Mariusz Mamoński &lt;<a class="reference external" href="mailto:mamonski&#64;man.poznan.pl">mamonski&#64;man.poznan.pl</a>&gt;</td></tr>
+<tr><th class="docinfo-name">Organization:</th>
+<td>FedStage System, Poznan Supercomputing and Networking Center</td></tr>
+<tr><th class="docinfo-name">Contact:</th>
+<td>Mariusz Mamonski &lt;<a class="reference external" href="mailto:mamonski&#64;man.poznan.pl">mamonski&#64;man.poznan.pl</a>&gt;</td></tr>
+<tr><th class="docinfo-name">Date:</th>
+<td>2009-05-05</td></tr>
+<tr><th class="docinfo-name">Version:</th>
+<td>1.0.5</td></tr>
+<tr><th class="docinfo-name">Revision:</th>
+<td>2340</td></tr>
+<tr><th class="docinfo-name">Copyright:</th>
+<td>Copyright (C) 2007-2008 FedStage Systems, Copyright (C) 2009-2010 Poznan Supercomputing and Networking Center</td></tr>
+</tbody>
+</table>
+<div class="abstract topic">
+<p class="topic-title first">Abstract</p>
+<p>This document describes installation, configuration and usage
+of FedStage DRMAA for LSF version 1.0.4.</p>
+</div>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id3">Introduction</a></li>
+<li><a class="reference internal" href="#installation" id="id4">Installation</a></li>
+<li><a class="reference internal" href="#configuration" id="id5">Configuration</a><ul>
+<li><a class="reference internal" href="#configuration-file-syntax" id="id6">Configuration file syntax</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#native-specification" id="id7">Native specification</a></li>
+<li><a class="reference internal" href="#release-notes" id="id8">Release notes</a><ul>
+<li><a class="reference internal" href="#changes-in-1-0-4-release" id="id9">Changes in 1.0.4 release</a></li>
+<li><a class="reference internal" href="#changes-in-1-0-3-release" id="id10">Changes in 1.0.3 release</a></li>
+<li><a class="reference internal" href="#changes-in-1-0-2-release" id="id11">Changes in 1.0.2 release</a></li>
+<li><a class="reference internal" href="#changes-in-1-0-1-release" id="id12">Changes in 1.0.1 release</a></li>
+<li><a class="reference internal" href="#known-bugs-and-limitations" id="id13">Known bugs and limitations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#developers" id="id14">Developers</a><ul>
+<li><a class="reference internal" href="#developer-tools" id="id15">Developer tools</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contact" id="id16">Contact</a></li>
+<li><a class="reference internal" href="#license" id="id17">License</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h1><a class="toc-backref" href="#id3">Introduction</a></h1>
+<p>FedStage DRMAA for LSF is an implementation of <a class="reference external" href="http://www.gridforum.org/">Open Grid Forum</a> <a class="reference external" href="http://www.drmaa.org/">DRMAA</a>
+1.0 (Distributed Resource Management Application API) <a class="reference external" href="http://www.ogf.org/documents/GFD.133.pdf">specification</a>
+for submission and control of jobs to <a class="reference external" href="http://www.platform.com/Products/platform-lsf-family">Platform LSF</a>.  Using DRMAA,
+grid applications builders, portal developers and ISVs can use the same
+high-level API to link their software with different cluster/resource
+management systems.</p>
+<p>This software also enables the integration of <a class="reference external" href="http://www.fedstage.com/wiki/FedStage_Computing">FedStage Computing</a> with the
+underlying LSF system for remote multi-user job submission and control
+over Web Services.</p>
+</div>
+<div class="section" id="installation">
+<h1><a class="toc-backref" href="#id4">Installation</a></h1>
+<p>To compile and install the library just go to main source directory
+and type:</p>
+<pre class="literal-block">
+$ ./configure [options] &amp;&amp; make
+$ sudo make install
+</pre>
+<p>The library requires LSF version 7.0 or further.
+To work with older versions it may require some patching.</p>
+<p>Notable <tt class="docutils literal">./configure</tt> script options:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">--with-lsf-inc</span></tt> LSF_INCLUDE_PATH</dt>
+<dd>Path to LSF header files (include dir).  This and <tt class="docutils literal"><span class="pre">--with-lsf-lib</span></tt>
+options are unnecessary if <tt class="docutils literal">LSF_ENVDIR</tt> environment variable is
+set correctly (e.g. by <tt class="docutils literal">$LSF_TOP/conf/profile.lsf</tt>).</dd>
+<dt><tt class="docutils literal"><span class="pre">--with-lsf-lib</span></tt> LSF_LIBRARY_PATH</dt>
+<dd>Path to LSF libraries (lib dir).</dd>
+<dt><tt class="docutils literal"><span class="pre">--with-lsf-static</span></tt></dt>
+<dd><p class="first">Link DRMAA against static LSF libraries instead of shared ones.</p>
+<div class="note last">
+<p class="first admonition-title">Note</p>
+<p class="last">In LSF 7.0.3 the shared libraries are broken in the way they
+have some undefined symbols which should be defined.  Using this
+option fixes this problem as static libraries are built correct.</p>
+</div>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">--prefix</span></tt> INSTALLATION_DIRECTORY</dt>
+<dd>Root directory where FedStage DRMAA for LSF shall be installed.
+When not given library is installed alongside with LSF.</dd>
+<dt><tt class="docutils literal"><span class="pre">--enable-debug</span></tt></dt>
+<dd>Compiles library with debugging enabled (with debugging symbols not
+stripped, without optimizations, and with many log messages enabled).
+Useful when you are to debug DRMAA enabled application
+or investigate problems with DRMAA library itself.</dd>
+</dl>
+</blockquote>
+<p>There are no unusual requirements for basic usage of library: ANSI C
+compiler and standard make program should suffice.  If you have taken
+sources directly from SVN repository or wish to run test-suite you would
+need additional <a class="reference internal" href="#developer-tools">developer tools</a>.  For further information regarding
+GNU build system see the INSTALL file.</p>
+</div>
+<div class="section" id="configuration">
+<h1><a class="toc-backref" href="#id5">Configuration</a></h1>
+<p>During DRMAA session initialization (<tt class="docutils literal">drmaa_init</tt>) library tries to
+read its configuration parameters from locations: <tt class="docutils literal">/etc/lsf_drmaa.conf</tt>,
+<tt class="docutils literal"><span class="pre">~/.lsf_drmaa.conf</span></tt> and from file given in <tt class="docutils literal">LSF_DRMAA_CONF</tt> environment
+variable (if set to non-empty string).  If multiple configuration
+sources are present then all configurations are merged with values
+from user-defined files taking precedence (in following order:
+<tt class="docutils literal">$LSF_DRMAA_CONF</tt>, <tt class="docutils literal"><span class="pre">~/.lsf_drmaa.conf</span></tt>, <tt class="docutils literal">/etc/lsf_drmaa.conf</tt>).</p>
+<p>Currently recognized configuration parameters are:</p>
+<blockquote>
+<dl class="docutils">
+<dt>pool_delay</dt>
+<dd><p class="first">Amount of time (in seconds) between successive checks of queue(s).</p>
+<p class="last">Type: integer, default: 5</p>
+</dd>
+<dt>cache_job_state</dt>
+<dd><p class="first">According to DRMAA specification every <tt class="docutils literal">drmaa_job_ps()</tt> call should
+query DRM system for job state.  With this option one may optimize
+communication with DRM.  If set to positive integer <tt class="docutils literal">drmaa_job_ps()</tt>
+returns remembered job state without communicating with DRM for
+<tt class="docutils literal">cache_job_state</tt> seconds since last update.  By default library
+conforms to specification (no caching will be performed).</p>
+<p class="last">Type: integer, default: 0</p>
+</dd>
+<dt>wait_thread</dt>
+<dd><p class="first">If set to 0 every call to <tt class="docutils literal">drmaa_wait()</tt> or <tt class="docutils literal">drmaa_synchronize()</tt> pools
+DRM for selected/all jobs. By default library creates additional
+thread which checks state of all job for duration of DRMAA session.
+<tt class="docutils literal">drmaa_wait()</tt>/<tt class="docutils literal">drmaa_synchronize()</tt> calls block until finished job
+is found.</p>
+<p class="last">Type: integer, default: 1</p>
+</dd>
+<dt>job_categories</dt>
+<dd><p class="first">Dictionary of job categories.  It's keys are job categories names
+mapped to <a class="reference internal" href="#native-specification">native specification</a> strings.  Attributes set by job
+category can be overridden by corresponding DRMAA attributes or
+native specification.  Special category name <tt class="docutils literal">default</tt> is used when
+<tt class="docutils literal">drmaa_job_category</tt> job attribute was not set.</p>
+<p class="last">Type: dictionary with string values, default: empty dictionary</p>
+</dd>
+<dt>lsb_events_file</dt>
+<dd><p class="first">The location of the <tt class="docutils literal">lsb.events</tt> file. If set the library polls
+the LSF events logfile instead of the LSF deamons.</p>
+<p class="last">Type: path, default: none</p>
+</dd>
+</dl>
+</blockquote>
+<div class="section" id="configuration-file-syntax">
+<h2><a class="toc-backref" href="#id6">Configuration file syntax</a></h2>
+<p>Configuration file is in form a dictionary.
+Dictionary is set of zero or more key-value pairs.
+Key is a string while value could be a string, an integer
+or another dictionary.</p>
+<pre class="literal-block">
+configuration: dictionary | dictionary_body
+dictionary: '{' dictionary_body '}'
+dictionary_body: (string ':' value ',')*
+value: integer | string | dictionary
+string: unquoted-string | single-quoted-string | double-quoted-string
+unquoted-string: [^ \t\n\r:,0-9][^ \t\n\r:,]*
+single-quoted-string: '[^']*'
+double-quoted-string: &quot;[^&quot;]*&quot;
+integer: [0-9]+
+</pre>
+</div>
+</div>
+<div class="section" id="native-specification">
+<h1><a class="toc-backref" href="#id7">Native specification</a></h1>
+<p>DRMAA interface allows to pass DRM dependent job submission options.
+Those options may be specified by settings <tt class="docutils literal">drmaa_native_specification</tt>
+or <tt class="docutils literal">drmaa_job_category</tt> job attribute.  <tt class="docutils literal">drmaa_native_specification</tt>
+accepts space delimited <tt class="docutils literal">bsub</tt> options while <tt class="docutils literal">drmaa_job_category</tt> is
+name of job category defined in <a class="reference internal" href="#configuration">configuration</a> file.  <tt class="docutils literal"><span class="pre">-a</span></tt> and <tt class="docutils literal">bsub</tt>
+options which are meant for interactive submission of jobs (<tt class="docutils literal"><span class="pre">-I</span></tt>, <tt class="docutils literal"><span class="pre">-Ip</span></tt>,
+<tt class="docutils literal"><span class="pre">-Is</span></tt>, <tt class="docutils literal"><span class="pre">-K</span></tt>) are <em>not</em> supported.</p>
+<p>Attributes set in native specification overrides corresponding DRMAA job
+attributes which overrides those set by job category.</p>
+<table border="1" class="docutils">
+<caption>Native specification strings with corresponding DRMAA attributes.</caption>
+<colgroup>
+<col width="46%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">DRMAA attribute</th>
+<th class="head">native specification</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>drmaa_job_name</td>
+<td><tt class="docutils literal"><span class="pre">-J</span></tt> job name</td>
+</tr>
+<tr><td>drmaa_input_path</td>
+<td><tt class="docutils literal"><span class="pre">-i</span></tt> input_path</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-is</span></tt> input_path</td>
+</tr>
+<tr><td>drmaa_output_path</td>
+<td><tt class="docutils literal"><span class="pre">-o</span></tt> output path</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-oo</span></tt> output_path</td>
+</tr>
+<tr><td>drmaa_error_path</td>
+<td><tt class="docutils literal"><span class="pre">-e</span></tt> error path</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-eo</span></tt> error_path</td>
+</tr>
+<tr><td>drmaa_start_time</td>
+<td><tt class="docutils literal"><span class="pre">-b</span></tt> start time</td>
+</tr>
+<tr><td>drmaa_deadline_time</td>
+<td><tt class="docutils literal"><span class="pre">-t</span></tt> end_deadline</td>
+</tr>
+<tr><td>drmaa_js_state</td>
+<td><tt class="docutils literal"><span class="pre">-H</span></tt></td>
+</tr>
+<tr><td>drmaa_transfer_files</td>
+<td><tt class="docutils literal"><span class="pre">-f</span></tt> file_stage_op</td>
+</tr>
+<tr><td>drmaa_v_email</td>
+<td><tt class="docutils literal"><span class="pre">-u</span></tt> mail_user</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-B</span></tt>, <tt class="docutils literal"><span class="pre">-N</span></tt></td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-m</span></tt> asked_hosts</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-x</span></tt></td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-n</span></tt> min_proc[,max_proc]</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-R</span></tt> res_req</td>
+</tr>
+<tr><td>drmaa_duration_hlimit</td>
+<td><tt class="docutils literal"><span class="pre">-c</span></tt> cpu_limit</td>
+</tr>
+<tr><td>drmaa_wct_hlimit</td>
+<td><tt class="docutils literal"><span class="pre">-W</span></tt> runtime_limit</td>
+</tr>
+<tr><td>drmaa_wct_slimit</td>
+<td><tt class="docutils literal"><span class="pre">-We</span></tt> estimated_runtime</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-M</span></tt> memory_limit</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-D</span></tt> data_limit</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-S</span></tt> stack_limit</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-v</span></tt> swap_limit</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-F</span></tt> file_limit</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-C</span></tt> core_limit</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-p</span></tt> process_limit</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-T</span></tt> thread_limit</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-ul</span></tt></td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-U</span></tt> reservation_id</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-ar</span></tt> reservation_id</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-wt</span></tt> warning_time</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-wa</span></tt> warning_action</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-s</span></tt> signal</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-q</span></tt> queue_name</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-w</span></tt> dependency</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-sp</span></tt> priority</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-r</span></tt>, <tt class="docutils literal"><span class="pre">-rn</span></tt></td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-G</span></tt> user_group</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-g</span></tt> job_group_name</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-P</span></tt> project_name</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-Lp</span></tt> ls_project_name</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-E</span></tt> pre_exec_cmd</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-Ep</span></tt> post_exec_cmd</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-app</span></tt> app_profile</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-ext</span></tt> sched_options</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-jsdl</span></tt> jsdl_doc</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-jsdl_strict</span></tt> jsdl_doc</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-k</span></tt> checkpoint_dir</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-L</span></tt> login_shell</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-sla</span></tt> service_class_name</td>
+</tr>
+<tr><td><!--  -->
+</td>
+<td><tt class="docutils literal"><span class="pre">-Z</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="release-notes">
+<h1><a class="toc-backref" href="#id8">Release notes</a></h1>
+<div class="section" id="changes-in-1-0-4-release">
+<h2><a class="toc-backref" href="#id9">Changes in 1.0.4 release</a></h2>
+<blockquote>
+<ul class="simple">
+<li>Fixed the core limit (-C) parsing in the native specification attribute.</li>
+<li>Fixed infinite loop on calling drmaa_wait/drmaa_synchronize routines after the <tt class="docutils literal">CLEAN_PERIOD</tt></li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="changes-in-1-0-3-release">
+<h2><a class="toc-backref" href="#id10">Changes in 1.0.3 release</a></h2>
+<blockquote>
+<ul class="simple">
+<li>Fixed segfault when <tt class="docutils literal">drmaa_v_env</tt> was set.
+Now uses <tt class="docutils literal">setenv</tt> and <tt class="docutils literal">unsetenv</tt> calls to modify environ
+instead of substituting <tt class="docutils literal">environ</tt> pointer.</li>
+<li><tt class="docutils literal">drmaa_transfer_files</tt> works (in progress).</li>
+<li>By default when <tt class="docutils literal"><span class="pre">--prefix</span></tt> is not given at configure time
+library is installed alongside with LSF.</li>
+<li>When waiting for any job or with waiting thread enabled
+status of all jobs is pooled from DRM in one LSF API call.</li>
+<li>New configuration option: <tt class="docutils literal">cache_job_state</tt>.</li>
+<li>More detailed error messages.</li>
+<li>It now compiles against LSF version 6.0 or futher although it was
+not tested at runtime.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="changes-in-1-0-2-release">
+<h2><a class="toc-backref" href="#id11">Changes in 1.0.2 release</a></h2>
+<blockquote>
+<ul class="simple">
+<li><tt class="docutils literal">drmaa_remote_command</tt> and <tt class="docutils literal">drmaa_v_argv</tt> are quoted
+and not interpreted by shell (e.g. spaces are allowed in command and
+arguments).  Jobs are created with <tt class="docutils literal">exec</tt> command i.e. unnecessary
+shell process dangling for duration of job was eliminated.</li>
+<li><tt class="docutils literal">drmaa_wifexited</tt> follow refinement on DRMAA Working Group mailing
+list - returns 1 only for exit statuses not greater than 128.
+Previously it returned 1 for all jobs which were run (not aborted).</li>
+<li>It has been reported that in some situations job which was recently
+submitted is not always immediately visible through LSF API.  There is
+now workaround for such behaviour.</li>
+<li><tt class="docutils literal">drmaa_transfer_files</tt> is ignored because of segfaults produced by it.</li>
+<li>Bugfixes: Segfault when <tt class="docutils literal">drmaa_v_argv</tt> is not set.
+Native specification parsing bugs.  Various other segfaults and
+memory leaks.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="changes-in-1-0-1-release">
+<h2><a class="toc-backref" href="#id12">Changes in 1.0.1 release</a></h2>
+<blockquote>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Version 1.0.1 of library was previously released with 2.0 version
+number.  Afterwards we decided this is misleading and does not follow
+versioning scheme established by DRMAA Working Group (i.e. it does not
+reflect the version of DRMAA specification implemented by the library).</p>
+</div>
+<ul class="simple">
+<li>Many attributes implemented:<ul>
+<li><tt class="docutils literal">drmaa_start_time</tt>,</li>
+<li><tt class="docutils literal">drmaa_native_specification</tt>,</li>
+<li><tt class="docutils literal">drmaa_transfer_files</tt>,</li>
+<li>job limits.</li>
+</ul>
+</li>
+<li>Integrates with <a class="reference external" href="http://www.fedstage.com/wiki/AdvanceReservation">FedStage Advance Reservation Library for LSF</a>.</li>
+<li>Job category now points to native specification string
+in configuration file instead of job group.</li>
+<li>Thread safe design.</li>
+<li>Configuration file(s).</li>
+<li>Lots of bug fixes.</li>
+<li>More robust code.</li>
+<li>Meaningful logging, error messages and codes.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="known-bugs-and-limitations">
+<h2><a class="toc-backref" href="#id13">Known bugs and limitations</a></h2>
+<p>Library covers all <a class="reference external" href="http://www.ogf.org/documents/GFD.133.pdf">DRMAA 1.0 specification</a> with exceptions listed
+below.  It was successfully tested with <a class="reference external" href="http://www.platform.com/Products/platform-lsf-family">Platform LSF</a> 7.0.3 on Linux
+OS and passes the <a class="reference external" href="http://drmaa.org/testsuite.php">official DRMAA test-suite</a>.  All mandatory and
+nearly all optional job attributes (except job run duration soft limit)
+are implemented.</p>
+<p>Known limitations:</p>
+<blockquote>
+<ul class="simple">
+<li><tt class="docutils literal">$drmaa_incr_ph$</tt> is replaced only within input, output and error file
+paths while according to specification it should be also substituted
+in job working directory.</li>
+<li>Host name is ignored in input, output and error path.
+They are always copied from and to submission host.</li>
+<li>Input file is copied from submission host when it is not present
+on execution host even when <tt class="docutils literal">i</tt> was not in transfer files attribute.</li>
+<li><tt class="docutils literal">drmaa_wcoredump()</tt> always returns <tt class="docutils literal">false</tt>.</li>
+</ul>
+</blockquote>
+</div>
+</div>
+<div class="section" id="developers">
+<h1><a class="toc-backref" href="#id14">Developers</a></h1>
+<p>Core functionality of DRMAA is put into <tt class="docutils literal">drmaa_utils</tt> library.
+This library was created in order to keep consistent common functionality
+of <a class="reference external" href="http://www.fedstage.com/wiki/FedStage_DRMAA_for_PBS_Pro">FedStage DRMAA for PBS Pro</a> and <a class="reference external" href="http://www.fedstage.com/wiki/FedStage_DRMAA_for_LSF">FedStage DRMAA for LSF</a> library.
+As it is independent from any particular DRM you may found this library
+useful for developing other DRMAAs.  For detailed information please
+take a look at <a class="reference external" href="../drmaa_utils/apidoc/html/index.html">source code documentation</a>.</p>
+<div class="section" id="developer-tools">
+<h2><a class="toc-backref" href="#id15">Developer tools</a></h2>
+<p>Although not needed for library user the following tools may be required
+if you intend to develop FedStage DRMAA for LSF:</p>
+<blockquote>
+<ul class="simple">
+<li>GNU autotools (autoconf, automake, libtool),</li>
+<li><a class="reference external" href="http://www.gnu.org/software/bison/">Bison</a> parser generator,</li>
+<li><a class="reference external" href="http://www.gnu.org/software/gperf/">gperf</a> perfect hash function generator,</li>
+<li><a class="reference external" href="http://research.cs.queensu.ca/~thurston/ragel/">Ragel</a> finite state machine compiler,</li>
+<li><a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> for processing this <tt class="docutils literal">README</tt>,</li>
+<li><a class="reference external" href="http://www.latex-project.org/">LaTeX</a> for creating documentation in PDF format,</li>
+<li><a class="reference external" href="http://www.stack.nl/~dimitri/doxygen/">Doxygen</a> for generating source code documentation.</li>
+</ul>
+</blockquote>
+</div>
+</div>
+<div class="section" id="contact">
+<h1><a class="toc-backref" href="#id16">Contact</a></h1>
+<p>Please send your comments or questions to the following mailing list:</p>
+<blockquote>
+<a class="reference external" href="https://www.fedstage.com/lists/listinfo/drmaa-lsf-users">https://www.fedstage.com/lists/listinfo/drmaa-lsf-users</a>
+(<a class="reference external" href="mailto:drmaa-lsf-users&#64;lists.fedstage.com">drmaa-lsf-users&#64;lists.fedstage.com</a>)</blockquote>
+<p>Please also visit the project webpage to find news and new releases of
+our software:</p>
+<blockquote>
+<a class="reference external" href="http://www.fedstage.com/wiki/FedStage_DRMAA_for_LSF">http://www.fedstage.com/wiki/FedStage_DRMAA_for_LSF</a></blockquote>
+</div>
+<div class="section" id="license">
+<h1><a class="toc-backref" href="#id17">License</a></h1>
+<p>Copyright (C) 2007-2008  FedStage Systems</p>
+<p>Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<!-- vim700: spell spelllang=en -->
+<!-- vim: ft=rst -->
+<!-- vim: ts=2 sw=2 et -->
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,5 @@
+TODO:
+ * test file joining, native specification
+ * test sending and blocking e-mails.
+ * ST_SUBMIT_KILL_SIG fails on SIGHUP (any other signal works fine) (?),
+ * consider removing -ar and/or --arid from NATIVE_SPECIFICATION and use only -U

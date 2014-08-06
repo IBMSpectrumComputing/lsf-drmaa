@@ -1,0 +1,139 @@
+%{
+/* $Id: drmaa_attrib.gperf 1409 2008-09-25 08:59:45Z lukasz $ */
+/*
+ *  FedStage DRMAA utilities library
+ *  Copyright (C) 2006-2008  FedStage Systems
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+#ifdef HAVE_CONFIG_H
+#	include <config.h>
+#endif
+
+#include <drmaa_utils/common.h>
+#include <drmaa_utils/drmaa_attrib.h>
+#include <drmaa_utils/template.h>
+
+#ifndef lint
+static char rcsid[]
+#	ifdef __GNUC__
+		__attribute__ ((unused))
+#	endif
+	= "$Id: drmaa_attrib.gperf 1409 2008-09-25 08:59:45Z lukasz $";
+#endif
+
+extern const fsd_attribute_t drmaa_attributes[];
+#define t(code) \
+	( & drmaa_attributes[ code ] )
+
+%}
+
+%language=ANSI-C
+%includes
+%readonly-tables
+%pic
+%define lookup-function-name drmaa_attrib_lookup
+%struct-type
+struct drmaa_attrib { int name; const fsd_attribute_t *attr; }
+
+%%
+drmaa_remote_command, t(DRMAA_ATTR_REMOTE_COMMAND)
+drmaa_v_argv, t(DRMAA_ATTR_ARGS)
+drmaa_js_state, t(DRMAA_ATTR_JOB_SUBMISSION_STATE)
+drmaa_v_env, t(DRMAA_ATTR_JOB_ENVIRONMENT)
+drmaa_wd, t(DRMAA_ATTR_WORKING_DIRECTORY)
+drmaa_job_category, t(DRMAA_ATTR_JOB_CATEGORY)
+drmaa_native_specification, t(DRMAA_ATTR_NATIVE_SPECIFICATION)
+drmaa_v_email, t(DRMAA_ATTR_EMAIL)
+drmaa_block_email, t(DRMAA_ATTR_BLOCK_EMAIL)
+drmaa_start_time, t(DRMAA_ATTR_START_TIME)
+drmaa_job_name, t(DRMAA_ATTR_JOB_NAME)
+drmaa_input_path, t(DRMAA_ATTR_INPUT_PATH)
+drmaa_output_path, t(DRMAA_ATTR_OUTPUT_PATH)
+drmaa_error_path, t(DRMAA_ATTR_ERROR_PATH)
+drmaa_join_files, t(DRMAA_ATTR_JOIN_FILES)
+drmaa_transfer_files, t(DRMAA_ATTR_TRANSFER_FILES)
+drmaa_deadline_time, t(DRMAA_ATTR_DEADLINE_TIME)
+drmaa_wct_hlimit, t(DRMAA_ATTR_HARD_WALL_CLOCK_TIME_LIMIT)
+drmaa_wct_slimit, t(DRMAA_ATTR_SOFT_WALL_CLOCK_TIME_LIMIT)
+drmaa_duration_hlimit, t(DRMAA_ATTR_HARD_RUN_DURATION_LIMIT)
+drmaa_duration_slimit, t(DRMAA_ATTR_SOFT_RUN_DURATION_LIMIT)
+%%
+
+#undef t
+
+static const fsd_attribute_t *
+drmaa_template_by_name( const fsd_template_t *self, const char *name )
+{
+	const struct drmaa_attrib *found;
+	found = drmaa_attrib_lookup( name, strlen(name) );
+	if( found != NULL )
+		return found->attr;
+	else
+		fsd_exc_raise_fmt(
+				FSD_ERRNO_INVALID_ARGUMENT,
+				"invalid DRMAA attribute name: %s", name
+				);
+}
+
+
+static const fsd_attribute_t *
+drmaa_template_by_code( const fsd_template_t *self, int code )
+{
+	if( 0 <= code  &&  code < DRMAA_N_ATTRIBUTES )
+		return & drmaa_attributes[ code ];
+	else
+		fsd_exc_raise_fmt(
+				FSD_ERRNO_INVALID_ARGUMENT,
+				"invalid attribute code: %d", code
+				);
+}
+
+
+fsd_template_t *
+drmaa_template_new(void)
+{
+	return fsd_template_new(
+			drmaa_template_by_name,
+			drmaa_template_by_code,
+			DRMAA_N_ATTRIBUTES
+			);
+}
+
+
+const fsd_attribute_t drmaa_attributes[ DRMAA_N_ATTRIBUTES ] = {
+	 { "drmaa_remote_command", DRMAA_ATTR_REMOTE_COMMAND, false },
+	 { "drmaa_v_argv", DRMAA_ATTR_ARGS, true },
+	 { "drmaa_js_state", DRMAA_ATTR_JOB_SUBMISSION_STATE, false },
+	 { "drmaa_v_env", DRMAA_ATTR_JOB_ENVIRONMENT, true },
+	 { "drmaa_wd", DRMAA_ATTR_WORKING_DIRECTORY, false },
+	 { "drmaa_job_category", DRMAA_ATTR_JOB_CATEGORY, false },
+	 { "drmaa_native_specification", DRMAA_ATTR_NATIVE_SPECIFICATION, false },
+	 { "drmaa_v_email", DRMAA_ATTR_EMAIL, true },
+	 { "drmaa_block_email", DRMAA_ATTR_BLOCK_EMAIL, false },
+	 { "drmaa_start_time", DRMAA_ATTR_START_TIME, false },
+	 { "drmaa_job_name", DRMAA_ATTR_JOB_NAME, false },
+	 { "drmaa_input_path", DRMAA_ATTR_INPUT_PATH, false },
+	 { "drmaa_output_path", DRMAA_ATTR_OUTPUT_PATH, false },
+	 { "drmaa_error_path", DRMAA_ATTR_ERROR_PATH, false },
+	 { "drmaa_join_files", DRMAA_ATTR_JOIN_FILES, false },
+	 { "drmaa_transfer_files", DRMAA_ATTR_TRANSFER_FILES, false },
+	 { "drmaa_deadline_time", DRMAA_ATTR_DEADLINE_TIME, false },
+	 { "drmaa_wct_hlimit", DRMAA_ATTR_HARD_WALL_CLOCK_TIME_LIMIT, false },
+	 { "drmaa_wct_slimit", DRMAA_ATTR_SOFT_WALL_CLOCK_TIME_LIMIT, false },
+	 { "drmaa_duration_hlimit", DRMAA_ATTR_HARD_RUN_DURATION_LIMIT, false },
+	 { "drmaa_duration_slimit", DRMAA_ATTR_SOFT_RUN_DURATION_LIMIT, false }
+};
+
+/* vim: set ft=c: */
