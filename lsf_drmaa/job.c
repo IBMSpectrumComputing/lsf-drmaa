@@ -168,14 +168,17 @@ lsfdrmaa_job_update_status( fsd_job_t *self )
 		 {
 			int n_records;
 			int more;
+			char * username = (lsf_self->int_job_id>0)?"all":NULL;
+
 			fsd_log_debug(( "drm connection locked" ));
 
 			n_records = lsb_openjobinfo( lsf_self->int_job_id,
-						NULL, NULL, NULL, NULL, ALL_JOB );
+						NULL, username, NULL, NULL, ALL_JOB );
 			fsd_log_debug((
-						"lsb_openjobinfo( %d[%d], NULL, NULL, NULL, NULL, ALL_JOB ) =%d",
+						"lsb_openjobinfo( %d[%d], NULL, %s, NULL, NULL, ALL_JOB ) =%d",
 						LSB_ARRAY_JOBID(lsf_self->int_job_id),
 						LSB_ARRAY_IDX(lsf_self->int_job_id),
+						username?username:"NULL",
 						n_records ));
 			job_in_queue = n_records > 0;
 			if( !job_in_queue  &&  !lately_submitted )
