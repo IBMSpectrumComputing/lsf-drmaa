@@ -347,6 +347,7 @@ if you intend to develop FedStage DRMAA for LSF:
 DRMAA Release Notes
 ===================
 
+
  Change on 2014/08/13
  ------------------------------
  - Fixed LSF DRMAA lib cannot work with galaxy
