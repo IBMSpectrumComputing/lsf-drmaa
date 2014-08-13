@@ -6,7 +6,7 @@ Version: 1.1.1
 
 Publication date: September 2013
 
-Last modified: 2 December 2013
+Last modified: 13 August 2014
 
 
 
@@ -346,6 +346,49 @@ if you intend to develop FedStage DRMAA for LSF:
 ===================
 DRMAA Release Notes
 ===================
+
+ Change on 2014/08/13
+ ------------------------------
+ - Fixed LSF DRMAA lib cannot work with galaxy
+   
+   The bug behavior is like below address
+   http://osdir.com/ml/galaxy-development-source-control/2014-03/msg00052.html
+   
+   1> First in Galaxy logic, drmaa.py will invoke the drmaa_external_runner.py 
+      to submit job and drmaa.py will use the stdout info which 
+      drmaa_external_runner.py print as a lsf jobid. When invoke the LSF 
+      drmma api to submit a job, the DRMAA API will print the message like 
+      "Job <78> is submitted to default queue <normal>" this.
+      So the drmaa.py will get a wrong lsf jobid.
+
+      If the Galaxy want to use this API, need modify the 
+      drmaa_external_runner.py script to handle this message.
+
+      LSF already support a env variable "BSUB_QUIET" to disable this message print out.
+      
+      Give a temporary fix on drmaa_external_runner.py file,
+      ----------------------------------------------------------------------------
+          diff -u drmaa_external_runner.orig.py drmaa_external_runner.py
+      --- drmaa_external_runner.orig.py       2014-08-12 02:10:46.141585000 -0400
+      +++ drmaa_external_runner.py    2014-08-12 02:10:20.007293000 -0400
+      @@ -124,6 +124,7 @@
+           userid, json_filename, assign_all_groups = validate_paramters()
+           set_user(userid, assign_all_groups)
+           json_file_exists(json_filename)
+      +    os.environ['BSUB_QUIET'] = 'Y'
+           s = drmaa.Session()
+           s.initialize()
+           jt = s.createJobTemplate()
+      ---------------------------------------------------------------------------
+
+    2> In lsf, the default behaviour is user only can query his job, 
+       user cannot see other users' job info.
+       Because in Galaxy, the user of submit job and query job is not same, 
+       so normal query job operation will be failed, which lead Galaxy think 
+       the job failed.
+       Update the DRMAA lib, if query job with an effective job id, user still 
+       can query other users' job info.
+
 
  Changes in DRMAA release 1.1.1
  ------------------------------
