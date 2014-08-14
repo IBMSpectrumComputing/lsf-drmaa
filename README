@@ -1,6 +1,4 @@
-Readme file for: LSF
-
-Product/Component Release:  9.1.2
+Readme file for: LSF DRMAA
 
 Version: 1.1.1
 
@@ -8,7 +6,7 @@ Publication date: September 2013
 
 Last modified: 13 August 2014
 
-
+The library requires LSF version 8.3 or later.
 
 FedStage DRMAA for LSF
 
