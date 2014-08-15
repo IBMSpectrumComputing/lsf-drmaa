@@ -348,24 +348,25 @@ DRMAA Release Notes
 
  Change on 2014/08/13
  ------------------------------
- - Fixed LSF DRMAA lib cannot work with galaxy
+ - Fix for LSF DRMAA lib to work with Galaxy
    
-   The bug behavior is like below address
+   The problem behavior is described at:
    http://osdir.com/ml/galaxy-development-source-control/2014-03/msg00052.html
    
-   1> First in Galaxy logic, drmaa.py will invoke the drmaa_external_runner.py 
-      to submit job and drmaa.py will use the stdout info which 
-      drmaa_external_runner.py print as a lsf jobid. When invoke the LSF 
-      drmma api to submit a job, the DRMAA API will print the message like 
-      "Job <78> is submitted to default queue <normal>" this.
-      So the drmaa.py will get a wrong lsf jobid.
+   1> In Galaxy logic, drmaa.py invokes the drmaa_external_runner.py 
+      to submit the job and drmaa.py uses the stdout info that
+      drmaa_external_runner.py prints as an lsf jobID.
+      Invoking the LSF drmma api to submit a job, the DRMAA API prints the following 
+      message:
 
-      If the Galaxy want to use this API, need modify the 
-      drmaa_external_runner.py script to handle this message.
+      "Job <78> is submitted to default queue <normal>"
 
-      LSF already support a env variable "BSUB_QUIET" to disable this message print out.
+      This means the drmaa.py will receive an incorrect lsf jobID.
+      If Galaxy must use this API, the drmaa_external_runner.py script must be modified 
+      to handle this message. The LSF environment variable "BSUB_QUIET" will disable this 
+      message.
       
-      Give a temporary fix on drmaa_external_runner.py file,
+      The following code change is a temporary fix for the drmaa_external_runner.py file: 
       ----------------------------------------------------------------------------
           diff -u drmaa_external_runner.orig.py drmaa_external_runner.py
       --- drmaa_external_runner.orig.py       2014-08-12 02:10:46.141585000 -0400
@@ -380,13 +381,12 @@ DRMAA Release Notes
            jt = s.createJobTemplate()
       ---------------------------------------------------------------------------
 
-    2> In lsf, the default behaviour is user only can query his job, 
-       user cannot see other users' job info.
-       Because in Galaxy, the user of submit job and query job is not same, 
-       so normal query job operation will be failed, which lead Galaxy think 
-       the job failed.
-       Update the DRMAA lib, if query job with an effective job id, user still 
-       can query other users' job info.
+    2> In LSF, the default behaviour is that a user can query only his own jobs and 
+       cannot see other users' job information. 
+       However, the user who submits the job and queries job is not same in Galaxy. 
+       A normal job query operation will fail, making Galaxy think the job failed.
+       This fix updates the DRMAA lib, so that if querying a job with an effective 
+       jobID, the user can also query other users' job info.
 
 
  Changes in DRMAA release 1.1.1
