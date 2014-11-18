@@ -30,6 +30,8 @@
 #include <drmaa_utils/common.h>
 #include <drmaa_utils/thread.h>
 
+#define MAX_PATH_LEN 1024
+
 /** Creates new DRMAA session. */
 fsd_drmaa_session_t *
 fsd_drmaa_session_new( const char *contact );
@@ -40,28 +42,6 @@ fsd_drmaa_session_new( const char *contact );
  */
 fsd_drmaa_session_t *
 fsd_drmaa_session_get(void);
-
-/**
- * An action to be taken when job is missing from queue.
- */
-typedef enum {
-	/**
-	 * Always raise #FSD_ERRNO_INTERNAL_ERROR (one per job)
-	 * in drmaa_wait() or drmaa_synchronize()
-	 * when job disappearance is spotted.
-	 */
-	FSD_REVEAL_MISSING_JOBS,
-	/**
-	 * Treat missing jobs as terminated with status
-	 * depending on last known state and action (drmaa_control()).
-	 */
-	FSD_IGNORE_MISSING_JOBS,
-	/**
-	 * Treat missing jobs as terminated
-	 * but only before they enter into running state.
-	 */
-	FSD_IGNORE_QUEUED_MISSING_JOBS
-} fsd_missing_jobs_behaviour_t;
 
 
 /** DRMAA session data. */
@@ -278,6 +258,12 @@ struct fsd_drmaa_session_s {
 	/** Queue pooling delay (time delta). */
 	struct timespec pool_delay;
 
+    int query_retries;
+
+    char monitor_task[MAX_PATH_LEN];
+
+    int (*start_monitor_task)(fsd_drmaa_session_t *self, char* arg);
+
 	/**
 	 * Cache job state for number of seconds.
 	 * If positive drmaa_job_ps() returns remembered state without
@@ -296,9 +282,9 @@ struct fsd_drmaa_session_s {
 	fsd_conf_dict_t *job_categories;
 
 	/**
-	 * How to behave when submitted job disappears from DRM queue.
+	 *Set job exit with this code when submitted job disappears from DRM queue.
 	 */
-	fsd_missing_jobs_behaviour_t missing_jobs;
+	int missing_jobs_exit_code;
 
 	fsd_mutex_t mutex; /**< Mutex for accessing session data. */
 	fsd_cond_t wait_condition;  /**< Conditional for drmaa_wait() */

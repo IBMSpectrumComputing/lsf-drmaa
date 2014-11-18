@@ -516,7 +516,7 @@ fsd_read_file(
 			do {
 				capacity = size + 1024;
 				fsd_realloc( buffer, capacity, char );
-				n_read = read( fd, buffer+size, capacity-size );
+				n_read = read( fd, buffer + size, capacity-size );
 				if( n_read == (ssize_t)-1 )
 					fsd_exc_raise_sys( 0 );
 				else
@@ -606,7 +606,7 @@ fsd_strsignal( int signum )
 		DETECT_SIG( SIGTTOU )
 		/* signals described in SUSv2 and SUSv3 / POSIX 1003.1-2001 */
 #ifdef SIGBUS
-		DETECT_SIG( SIGBUS    )
+		DETECT_SIG( SIGBUS	)
 #endif
 #ifdef SIGPOLL
 		DETECT_SIG( SIGPOLL	  )

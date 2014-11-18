@@ -45,17 +45,12 @@
 #define _log_nop \
 	do { /* nothing */ } while(0)
 
-#ifdef DEBUGGING
-#	define fsd_log_trace(args)   _log_fmt(FSD_LOG_TRACE, _FSD_LOG_MSG, args)
-#	define fsd_log_debug(args)   _log_fmt(FSD_LOG_DEBUG, _FSD_LOG_MSG, args)
-#	define fsd_log_enter(args)   _log_fmt(FSD_LOG_TRACE, _FSD_LOG_ENTER, args)
-# define fsd_log_return(args)  _log_fmt(FSD_LOG_TRACE, _FSD_LOG_RETURN, args)
-#else /* ! DEBUGGING */
-#	define fsd_log_trace(args)   _log_nop
-#	define fsd_log_debug(args)   _log_nop
-#	define fsd_log_enter(args)   _log_nop
-#	define fsd_log_return(args)  _log_nop
-#endif
+
+#define fsd_log_trace(args)   _log_fmt(FSD_LOG_TRACE, _FSD_LOG_MSG, args)
+#define fsd_log_debug(args)   _log_fmt(FSD_LOG_DEBUG, _FSD_LOG_MSG, args)
+#define fsd_log_enter(args)   _log_fmt(FSD_LOG_TRACE, _FSD_LOG_ENTER, args)
+#define fsd_log_return(args)  _log_fmt(FSD_LOG_TRACE, _FSD_LOG_RETURN, args)
+
 
 #define fsd_log_info(args)     _log_fmt(FSD_LOG_INFO, _FSD_LOG_MSG, args)
 #define fsd_log_warning(args)  _log_fmt(FSD_LOG_WARNING, _FSD_LOG_MSG, args)

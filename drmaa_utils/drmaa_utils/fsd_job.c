@@ -72,6 +72,7 @@ fsd_job_new( char *job_id )
 		self->walltime          = 0;
 		self->n_execution_hosts = 0;
 		self->execution_hosts   = NULL;
+                self->retry_cnt          = 0;
 		fsd_mutex_init( &self->mutex );
 		fsd_cond_init( &self->status_cond );
 		fsd_cond_init( &self->destroy_cond );

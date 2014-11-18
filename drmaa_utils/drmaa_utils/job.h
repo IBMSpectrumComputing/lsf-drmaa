@@ -172,6 +172,8 @@ struct fsd_job_s {
 	fsd_cond_t   status_cond;
 	/** Able to destroy condition variable (ref_cnt==1). */
 	fsd_cond_t   destroy_cond;
+
+	int retry_cnt;
 };
 
 

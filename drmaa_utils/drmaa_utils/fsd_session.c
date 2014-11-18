@@ -20,6 +20,14 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+
+
+
 
 #include <drmaa_utils/conf.h>
 #include <drmaa_utils/drmaa.h>
@@ -156,6 +164,8 @@ fsd_drmaa_session_apply_configuration(
 		fsd_drmaa_session_t *self
 		);
 
+static int fsd_drmaa_session_start_monitor_task(fsd_drmaa_session_t *self,
+	char *arg);
 
 
 fsd_drmaa_session_t *
@@ -191,6 +201,7 @@ fsd_drmaa_session_new( const char *contact )
 		self->load_configuration = fsd_drmaa_session_load_configuration;
 		self->read_configuration = fsd_drmaa_session_read_configuration;
 		self->apply_configuration = fsd_drmaa_session_apply_configuration;
+		self->start_monitor_task = fsd_drmaa_session_start_monitor_task;
 
 		self->ref_cnt = 1;
 		self->destroy_requested = false;
@@ -202,9 +213,11 @@ fsd_drmaa_session_new( const char *contact )
 		self->cache_job_state = 0;
 		self->enable_wait_thread = true;
 		self->job_categories = NULL;
-		self->missing_jobs = FSD_REVEAL_MISSING_JOBS;
+		self->missing_jobs_exit_code=1;
 		self->wait_thread_started = false;
 		self->wait_thread_run_flag = false;
+		self->query_retries = 0;
+		self->monitor_task[0] = '\0';
 
 		fsd_mutex_init( &self->mutex );
 		fsd_cond_init( &self->wait_condition );
@@ -289,6 +302,7 @@ fsd_drmaa_session_destroy( fsd_drmaa_session_t *self )
 void
 fsd_drmaa_session_destroy_nowait( fsd_drmaa_session_t *self )
 {
+	int fsd_log_fd = -1;
 	fsd_log_enter(( "" ));
 	fsd_conf_dict_destroy( self->configuration );
 	fsd_free( self->contact );
@@ -301,6 +315,12 @@ fsd_drmaa_session_destroy_nowait( fsd_drmaa_session_t *self )
 	fsd_cond_destroy( &self->destroy_condition );
 	fsd_mutex_destroy( &self->drm_connection_mutex );
 
+	fsd_log_fd = fsd_get_logging_fd();
+
+	if(fsd_log_fd > 2){
+		close(fsd_log_fd);
+		fsd_set_logging_fd(2);
+	}
 	fsd_free( self );
 	fsd_log_return(( "" ));
 }
@@ -526,7 +546,10 @@ fsd_drmaa_session_wait_for_single_job(
 		if( job == NULL )
 			fsd_exc_raise_fmt( FSD_DRMAA_ERRNO_INVALID_JOB,
 					"Job '%s' not found in DRMS queue", job_id );
-		job->update_status( job );
+		
+				if(!self->enable_wait_thread){
+			job->update_status( job );
+		}
 		while( !self->destroy_requested  &&  job->state < DRMAA_PS_DONE )
 		 {
 			bool signaled = true;
@@ -556,7 +579,7 @@ fsd_drmaa_session_wait_for_single_job(
 		 }
 
 		if( self->destroy_requested )
-			fsd_exc_raise_code( FSD_DRMAA_ERRNO_EXIT_TIMEOUT );
+			fsd_exc_raise_code( FSD_DRMAA_ERRNO_NO_ACTIVE_SESSION );
 
 		job->get_termination_status( job, status, rusage );
 		if( dispose )
@@ -722,7 +745,7 @@ void *
 fsd_drmaa_session_wait_thread( fsd_drmaa_session_t *self )
 {
 	struct timespec ts, *next_check = &ts;
-        bool volatile locked = false;
+		bool volatile locked = false;
 
 	fsd_log_enter(( "" ));
 	locked = fsd_mutex_lock( &self->mutex );
@@ -852,6 +875,7 @@ fsd_drmaa_session_load_configuration(
 	char *volatile system_conf = NULL;
 	char *volatile user_conf = NULL;
 	char *volatile varname = NULL;
+	char *volatile lsf_envconf = NULL;
 	TRY
 	 {
 		const char *home;
@@ -877,13 +901,24 @@ fsd_drmaa_session_load_configuration(
 		if( envvalue )
 			self->configuration = fsd_conf_read(
 				 self->configuration, envvalue, true, NULL, 0 );
+
+		/*add LSF_ENVDIR as search path*/
+		envvalue = getenv( "LSF_ENVDIR" );
+		if(envvalue){
+			lsf_envconf = fsd_asprintf( "%s/%s.conf", envvalue, basename );
+			self->configuration = fsd_conf_read(
+			 self->configuration, lsf_envconf, false, NULL, 0 );
+		}
+
 		self->apply_configuration( self );
+		
 	 }
 	FINALLY
 	 {
 		fsd_free( system_conf );
 		fsd_free( user_conf );
 		fsd_free( varname );
+		fsd_free( lsf_envconf );
 	 }
 	END_TRY
 }
@@ -903,6 +938,32 @@ fsd_drmaa_session_read_configuration(
 	self->apply_configuration( self );
 }
 
+#define MAX_LINE_LEN 4096
+#define MAX_COMMAND_LEN 1024
+static int fsd_drmaa_session_start_monitor_task(fsd_drmaa_session_t *self, 
+	char *arg)
+{
+	char cmd[MAX_COMMAND_LEN];
+	FILE *fp = NULL;
+	char out[MAX_LINE_LEN];
+
+	snprintf(cmd, MAX_COMMAND_LEN-1, "%s %s 2>&1", self->monitor_task, arg);
+	 
+	fp = popen((const char*)cmd, "r");
+	if(!fp){
+		fsd_log_warning(("failed to run monitor task <%s>", cmd));
+		return -1;
+	}
+	fsd_log_warning(("run monitor task"));
+	while (fgets(out, sizeof(out), fp) != NULL) {
+		fsd_log_warning(("%s",out));
+		
+	}
+	fsd_log_warning(("monitor task finish"));
+	pclose(fp);
+	
+	return 0;
+}
 
 void
 fsd_drmaa_session_apply_configuration( fsd_drmaa_session_t *self )
@@ -911,7 +972,11 @@ fsd_drmaa_session_apply_configuration( fsd_drmaa_session_t *self )
 	fsd_conf_option_t *cache_job_state = NULL;
 	fsd_conf_option_t *wait_thread = NULL;
 	fsd_conf_option_t *job_categories = NULL;
-	fsd_conf_option_t *missing_jobs = NULL;
+	fsd_conf_option_t *exit_code_for_missing_jobs = NULL;
+	fsd_conf_option_t *log_path = NULL;
+	fsd_conf_option_t *log_level = NULL;
+	fsd_conf_option_t *query_retries = NULL;
+	fsd_conf_option_t *monitor_task = NULL;
 
 	fsd_log_enter((""));
 	if( self->configuration  !=  NULL ) {
@@ -924,8 +989,17 @@ fsd_drmaa_session_apply_configuration( fsd_drmaa_session_t *self )
 				self->configuration, "wait_thread" );
 		job_categories = fsd_conf_dict_get(
 				self->configuration, "job_categories" );
-		missing_jobs = fsd_conf_dict_get(
-				self->configuration, "missing_jobs" );
+		exit_code_for_missing_jobs = fsd_conf_dict_get(
+				self->configuration, "exit_code_for_missing_jobs" );
+		log_path = fsd_conf_dict_get(
+				self->configuration, "log_path" );
+		log_level = fsd_conf_dict_get(
+				self->configuration, "log_level" );
+		query_retries = fsd_conf_dict_get(
+				self->configuration, "query_retries" );
+		monitor_task = fsd_conf_dict_get(
+				self->configuration, "monitor_task" );
+		
 	}
 
 	if( pool_delay )
@@ -980,30 +1054,118 @@ fsd_drmaa_session_apply_configuration( fsd_drmaa_session_t *self )
 					"configuration: 'job_categories' should be dictionary"
 					);
 	 }
-	if( missing_jobs )
+	if( exit_code_for_missing_jobs )
 	 {
-		bool ok = true;
-		if( missing_jobs->type != FSD_CONF_STRING )
+		
+		if( exit_code_for_missing_jobs->type == FSD_CONF_INTEGER &&
+				exit_code_for_missing_jobs->val.integer >= 0 &&
+				exit_code_for_missing_jobs->val.integer <=128)
 		 {
-			const char *value = missing_jobs->val.string;
-			if( !strcmp( value, "ignore" ) )
-				self->missing_jobs = FSD_IGNORE_MISSING_JOBS;
-			else if( !strcmp( value, "ignore-queued" ) )
-				self->missing_jobs = FSD_IGNORE_QUEUED_MISSING_JOBS;
-			else if( !strcmp( value, "reveal" ) )
-				self->missing_jobs = FSD_REVEAL_MISSING_JOBS;
-			else
-				ok = false;
+			fsd_log_debug(("exit_code_for_missing_jobs=%d", exit_code_for_missing_jobs->val.integer));
+			self->missing_jobs_exit_code = exit_code_for_missing_jobs->val.integer;
 		 }
-		else
-			ok = false;
+		 else{
+			fsd_exc_raise_msg(
+			FSD_ERRNO_INTERNAL_ERROR,
+			"configuration: 'exit_code_for_missing_jobs' should be an integer from 0 to 128"
+			);
+		} 
+			
+	 }
 
-		if( !ok )
+	 if( log_path )
+	 {
+		const char * path = NULL;
+		int log_fd = -1;
+		if( log_path->type == FSD_CONF_STRING )
+		{
+				path = log_path->val.string;
+		}else{
 			fsd_exc_raise_msg(
 					FSD_ERRNO_INTERNAL_ERROR,
-					"configuration: 'missing_jobs' should be one of: "
-					"'ignore', 'ignore-queued' or 'reveal'"
+					"configuration: 'log_path' must be path"
 					);
+		}
+
+		if(path){
+			log_fd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IRWXU|S_IRGRP|S_IROTH);
+			if(log_fd != -1){
+				fsd_set_logging_fd(log_fd);
+			}else{
+				perror("open log file");
+				fsd_exc_raise_msg(
+				FSD_ERRNO_INTERNAL_ERROR,
+				"configuration: Can not open log_path"
+				);
+			}
+		}
+	 }
+
+	 if( log_level)
+	 {
+		
+		bool isValid = true;
+		if( log_level->type == FSD_CONF_STRING )
+		 {
+			const char *value = log_level->val.string;
+			if( !strcmp( value, "LOG_WARNING" ) )
+				fsd_set_verbosity_level(FSD_LOG_WARNING);
+			else if( !strcmp( value, "LOG_TRACE" ) )
+				fsd_set_verbosity_level(FSD_LOG_TRACE);
+			else if( !strcmp(value, "LOG_DEBUG"))
+				fsd_set_verbosity_level(FSD_LOG_DEBUG);
+			else if( !strcmp(value, "LOG_INFO"))
+				fsd_set_verbosity_level(FSD_LOG_INFO);
+			else if( !strcmp( value, "LOG_ERROR" ) )
+				fsd_set_verbosity_level(FSD_LOG_ERROR);
+			else
+				isValid = false;
+		 }else{
+			isValid = false;
+		 }
+		 
+
+		if( !isValid )
+			fsd_exc_raise_msg(
+					FSD_ERRNO_INTERNAL_ERROR,
+					"configuration: 'log_level' should be one of: "
+					"'LOG_TRACE', 'LOG_DEBUG', 'LOG_INFO', 'LOG_WARNING' or 'LOG_ERROR'"
+					);
+	 }
+
+	 if( query_retries)
+	 {
+		if( query_retries->type == FSD_CONF_INTEGER
+				&&  query_retries->val.integer > 0 )
+		 {
+			fsd_log_debug(("query_retries=%d", query_retries->val.integer));
+			self->query_retries = query_retries->val.integer;
+		 }
+		else
+			fsd_exc_raise_msg(
+					FSD_ERRNO_INTERNAL_ERROR,
+					"configuration: 'query_retries' must be positive integer"
+					);
+	 }
+
+	 if( monitor_task )
+	 {
+		if( monitor_task->type == FSD_CONF_STRING )
+		{
+			if(strlen(monitor_task->val.string) > 1024){
+				fsd_exc_raise_msg(
+				FSD_ERRNO_INTERNAL_ERROR,
+				"configuration: the path of monitor_task should be shorter than 1024"
+				);
+			}else{
+				strcpy(self->monitor_task, monitor_task->val.string);
+			}
+		}else{
+				fsd_exc_raise_msg(
+				FSD_ERRNO_INTERNAL_ERROR,
+				"configuration: Invalid monitor_task"
+				);
+		}
 	 }
 
 	if( self->enable_wait_thread  &&  !self->wait_thread_started )

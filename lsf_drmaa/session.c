@@ -51,7 +51,7 @@ lsfdrmaa_session_update_all_jobs_status( fsd_drmaa_session_t *self );
 static void
 lsfdrmaa_session_apply_configuration( fsd_drmaa_session_t *self );
 
-
+	
 fsd_drmaa_session_t *
 lsfdrmaa_session_new( const char *contact )
 {
@@ -71,6 +71,7 @@ lsfdrmaa_session_new( const char *contact )
 		self->super.apply_configuration = lsfdrmaa_session_apply_configuration;
 		self->prepand_report_to_output = false;
 		self->super.load_configuration( &self->super, "lsf_drmaa" );
+		
 	 }
 	EXCEPT_DEFAULT
 	 {
@@ -267,7 +268,7 @@ lsfdrmaa_session_update_all_jobs_status( fsd_drmaa_session_t *self )
 		 }
 
 		conn_lock = fsd_mutex_lock( &self->drm_connection_mutex );
-		n_records = lsb_openjobinfo( 0, NULL, NULL, NULL, NULL, ALL_JOB );
+		n_records = lsb_openjobinfo( 0, NULL, "all", NULL, NULL, ALL_JOB );
 		if(n_records > 0)
 			fsd_calloc( job_info_array, n_records, struct jobInfoEnt* );
 		for( i = 0;  i < n_records;  i++ )
@@ -310,14 +311,18 @@ lsfdrmaa_session_update_all_jobs_status( fsd_drmaa_session_t *self )
 		for( job_iter = (const char **)all_job_ids;  *job_iter;  job_iter++ )
 		 {
 			job = self->get_job( self, *job_iter );
-			if( job->flags & FSD_JOB_MISSING )
-			 {
-				fsd_log_warning(( "job %s missing from DRM queue",
-							job->job_id ));
-			 }
-			job->release( job );
+			if(job != NULL){
+				TRY
+				{
+					if( job->flags & FSD_JOB_MISSING )
+					 {
+						 job->on_missing( job );
+					 }
+				}
+				FINALLY{ job->release( job ); }
+				END_TRY
+			}
 		 }
-		 fsd_free_vector( all_job_ids );
 	 }
 	FINALLY
 	 {
@@ -333,7 +338,7 @@ lsfdrmaa_session_update_all_jobs_status( fsd_drmaa_session_t *self )
 				lsfdrmaa_free_job_info( job_info_array[i] );
 			fsd_free( job_info_array );
 		 }
-		
+		fsd_free_vector( all_job_ids );
 	 }
 	END_TRY
 

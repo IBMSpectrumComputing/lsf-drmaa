@@ -148,19 +148,50 @@ lsfdrmaa_job_control( fsd_job_t *self, int action )
 	fsd_log_return(( "" ));
 }
 
-#define LSFDRMAA_MAX_QUEUE_SKEW (500)
+#define LSFDRMAA_MAX_QUEUE_SKEW (30)
 
+static void 
+lsfdrmaa_job_on_missing(fsd_job_t *self)
+{
+	const bool lately_submitted =
+			(self->flags & FSD_JOB_CURRENT_SESSION)
+			&& self->state == DRMAA_PS_UNDETERMINED
+
+	&& (time(NULL) - self->submit_time < LSFDRMAA_MAX_QUEUE_SKEW);
+
+	if(lately_submitted){
+		/*the job was submitted just now, wait a moment to check DRM queue*/
+		return ;
+	}
+
+	if(self->session->query_retries > 0 &&   
+		self->retry_cnt < self->session->query_retries){
+		self->retry_cnt++;
+		fsd_log_warning(( "job %s missing from DRM queue", self->job_id ));
+		return ;
+	}
+
+	/*start a monitor task to collect information for missing job*/
+	if(self->session->monitor_task[0] != '\0'){
+		self->session->start_monitor_task(self->session, self->job_id);
+	}
+
+	fsd_log_warning(( "terminate the missing job %s", self->job_id ));
+	self->state = DRMAA_PS_FAILED;
+	self->flags &= ~FSD_JOB_STATE_MASK;
+	self->flags |= FSD_JOB_ABORTED;
+	self->exit_status = ((self->session->missing_jobs_exit_code)&0xff)<<8;
+	self->end_time = time(NULL);
+	self->last_update_time = time(NULL);
+	fsd_cond_broadcast( &self->status_cond ); 
+}
 static void
 lsfdrmaa_job_update_status( fsd_job_t *self )
 {
 	lsfdrmaa_job_t *lsf_self = (lsfdrmaa_job_t*)self;
 	struct jobInfoEnt *volatile job_info = NULL;
-	bool job_in_queue;
-	const bool lately_submitted =
-		(self->flags & FSD_JOB_CURRENT_SESSION)
-		&& self->state == DRMAA_PS_UNDETERMINED
-		&& (time(NULL) - self->submit_time < LSFDRMAA_MAX_QUEUE_SKEW);
-
+	bool job_in_queue;	
+	
 	fsd_log_enter(( "({job_id=%s, time_delta=%d})", self->job_id, time(NULL) - self->submit_time ));
 	do {
 		fsd_mutex_lock( &self->session->drm_connection_mutex );
@@ -180,32 +211,23 @@ lsfdrmaa_job_update_status( fsd_job_t *self )
 						LSB_ARRAY_IDX(lsf_self->int_job_id),
 						username?username:"NULL",
 						n_records ));
-			job_in_queue = n_records > 0;
-			if( !job_in_queue  &&  !lately_submitted )
-			 {
-				if( n_records < 0 ) {
-					if ((self->flags & FSD_JOB_CURRENT_SESSION) && (self->state == DRMAA_PS_UNDETERMINED)) {
-						/*synchronize/wait called after CLEAN PERIOD */
-						/* lsfdrmaa_openjobinfo_from_log(); */
-						fsd_exc_raise_lsf( "lsb_openjobinfo" );
-					} else {
-						fsd_exc_raise_lsf( "lsb_openjobinfo" );
-					}
-				} else
-					fsd_exc_raise_code( FSD_DRMAA_ERRNO_INVALID_JOB );
-			 }
-
-			if( job_in_queue )
-			 {
-				job_info = lsb_readjobinfo( &more );
+			
+						job_in_queue = n_records > 0;
+			
+						if(!job_in_queue){
+				if(!(self->flags & FSD_JOB_CURRENT_SESSION)){
+									fsd_exc_raise_code( FSD_DRMAA_ERRNO_INVALID_JOB );
+								 }else{/*handling missing job*/
+									 self->on_missing(self);
+								 }
+						}else{
+								job_info = lsb_readjobinfo( &more );
 				fsd_log_debug(( "lsb_readjobinfo(...) =%p: more=%d",
 							(void*)job_info, more ));
 				if( job_info == NULL )
 					fsd_exc_raise_lsf( "lsb_readjobinfo" );
 				lsf_self->read_job_info( self, job_info );
-			 }else{
-                             fsd_exc_raise_code( FSD_DRMAA_ERRNO_INVALID_JOB );
-                         }
+						}
 		 }
 		FINALLY
 		 {
@@ -227,7 +249,6 @@ lsfdrmaa_job_read_job_info( fsd_job_t *self, struct jobInfoEnt *job_info )
 	int status, flags;
 
 	fsd_log_enter(( "" ));
-#ifdef DEBUGGING
 	 {
 		int i;
 		fsd_log_debug(( "job status of %s updated from %d[%d]",
@@ -254,7 +275,6 @@ lsfdrmaa_job_read_job_info( fsd_job_t *self, struct jobInfoEnt *job_info )
 		fsd_log_debug(( "\n  jName: %s", job_info->jName ));
 		/* fsd_log_debug(( "\n  execRusage: %s", job_info->execRusage )); */
 	 }
-#endif /* DEBUGGING */
 
 	status = job_info->status;
 
@@ -329,6 +349,7 @@ lsfdrmaa_job_new( char *job_id )
 	self->super.control = lsfdrmaa_job_control;
 	self->super.update_status = lsfdrmaa_job_update_status;
 	self->read_job_info = lsfdrmaa_job_read_job_info;
+	self->super.on_missing = lsfdrmaa_job_on_missing;
 	self->int_job_id = int_job_id;
 	return (fsd_job_t*)self;
 }

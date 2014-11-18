@@ -72,6 +72,14 @@ fsd_set_logging_fd( int fd )
 }
 
 
+int
+fsd_get_logging_fd( )
+{
+	return fsd_logging_output;
+}
+
+
+
 void
 fsd_color( char *output, size_t len, int n )
 {
@@ -87,13 +95,13 @@ fsd_log_level_char( int level )
 {
 	switch( level )
 	 {
-		case FSD_LOG_TRACE:    return 't';
-		case FSD_LOG_DEBUG:    return 'd';
-		case FSD_LOG_INFO:     return 'I';
+		case FSD_LOG_TRACE:	return 't';
+		case FSD_LOG_DEBUG:	return 'd';
+		case FSD_LOG_INFO:	 return 'I';
 		case FSD_LOG_WARNING:  return 'W';
-		case FSD_LOG_ERROR:    return 'E';
-		case FSD_LOG_FATAL:    return 'F';
-		default:               return '?';
+		case FSD_LOG_ERROR:	return 'E';
+		case FSD_LOG_FATAL:	return 'F';
+		default:			   return '?';
 	 }
 }
 
