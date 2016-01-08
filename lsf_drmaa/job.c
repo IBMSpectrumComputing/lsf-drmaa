@@ -148,7 +148,7 @@ lsfdrmaa_job_control( fsd_job_t *self, int action )
 	fsd_log_return(( "" ));
 }
 
-#define LSFDRMAA_MAX_QUEUE_SKEW (30)
+#define LSFDRMAA_MAX_QUEUE_SKEW (300)
 
 static void 
 lsfdrmaa_job_on_missing(fsd_job_t *self)
