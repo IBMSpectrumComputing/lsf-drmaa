@@ -62,6 +62,7 @@ grid applications builders, portal developers and ISVs can use the same
 high-level API to link their software with different cluster/resource
 management systems.
 
+Here I also included Java bindings so that you can use Java DRMAA v1 API.
 
 This software also enables the integration of FedStage Computing with the
 underlying LSF system for remote multi-user job submission and control LSF
@@ -75,8 +76,6 @@ DRMAA which can be found at http://sourceforge.net/projects/lsf-drmaa/.
 Platform Computing will provide formal support for this software 
 to entitled 
 clients via the normal IBM support channels.
-
-
 
 
 
@@ -95,7 +94,8 @@ and type:
   $ ./configure [options] && make
   $ sudo make install
 
-
+See Roy Storey's Note from his repo (https://github.com/kiwiroy/openlava-drmaa) regarding shared libraries. Until that problem gets fixed make sure that you use static libraries:
+`.configure --with-lsf-static [other-options]`
 
 The library requires LSF version 8.3 or later.
 
