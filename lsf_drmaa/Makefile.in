@@ -14,6 +14,25 @@
 
 @SET_MAKE@
 
+# $Id: Makefile.am 2304 2009-04-09 16:27:37Z lukasz $
+#
+# FedStage DRMAA for LSF
+# Copyright (C) 2007-2008  FedStage Systems
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
 
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
@@ -88,7 +107,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
 	$(top_srcdir)/m4/ax_docutils.m4 \
 	$(top_srcdir)/m4/ax_gcc_warnings.m4 \
 	$(top_srcdir)/m4/ax_jni_include_dir.m4 \
-	$(top_srcdir)/m4/ax_lsf.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/ax_lsf.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -268,23 +290,6 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
-#
-# FedStage DRMAA for LSF
-# Copyright (C) 2007-2008  FedStage Systems
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 RAGEL = @RAGEL@
 RANLIB = @RANLIB@
 RST2HTML = @RST2HTML@
@@ -759,7 +764,6 @@ uninstall-am: uninstall-dist_sysconfDATA uninstall-libLTLIBRARIES
 	tags tags-am uninstall uninstall-am uninstall-dist_sysconfDATA \
 	uninstall-libLTLIBRARIES
 
-# $Id: Makefile.am 2304 2009-04-09 16:27:37Z lukasz $
 
 native.c : native.rl
 	$(RAGEL) $(RAGELFLAGS) -o native.c native.rl
