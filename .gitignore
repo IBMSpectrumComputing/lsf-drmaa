@@ -9,3 +9,5 @@ Makefile
 stamp-h1
 config.status
 config.h
+libtool
+Doxyfile
