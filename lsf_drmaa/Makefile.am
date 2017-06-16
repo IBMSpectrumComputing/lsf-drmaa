@@ -1,4 +1,4 @@
-'# $Id: Makefile.am 2304 2009-04-09 16:27:37Z lukasz $
+# $Id: Makefile.am 2304 2009-04-09 16:27:37Z lukasz $
 #
 # FedStage DRMAA for LSF
 # Copyright (C) 2007-2008  FedStage Systems

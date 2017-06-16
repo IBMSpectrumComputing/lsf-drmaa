@@ -759,7 +759,7 @@ uninstall-am: uninstall-dist_sysconfDATA uninstall-libLTLIBRARIES
 	tags tags-am uninstall uninstall-am uninstall-dist_sysconfDATA \
 	uninstall-libLTLIBRARIES
 
-'# $Id: Makefile.am 2304 2009-04-09 16:27:37Z lukasz $
+# $Id: Makefile.am 2304 2009-04-09 16:27:37Z lukasz $
 
 native.c : native.rl
 	$(RAGEL) $(RAGELFLAGS) -o native.c native.rl
