@@ -316,7 +316,7 @@ errnum = drmaa_run_bulk_jobs(&ids, jt, start, end, step, error, DRMAA_ERROR_STRI
 
 if (errnum != DRMAAJ_ERRNO_SUCCESS) {
   throw_exception(env, errnum, error);
-  drmaa_release_job_ids (ids);
+  if (ids != NULL) drmaa_release_job_ids (ids);
   return NULL;
 }
 
@@ -332,6 +332,7 @@ clazz = (*env)->FindClass (env, "java/lang/String");
 ret_val = (*env)->NewObjectArray(env, num_elem, clazz, NULL);
 
 for (count = 0; count < num_elem; count++) {
+
    errnum = drmaa_get_next_job_id(ids, buffer, DRMAA_JOBNAME_BUFFER);
    if (errnum != DRMAAJ_ERRNO_SUCCESS) {
      throw_exception(env, errnum, "Reported incorrect number of job ids");
