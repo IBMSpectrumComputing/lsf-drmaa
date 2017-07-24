@@ -331,12 +331,12 @@ Although not needed for library users, the following tools may be required
 if you intend to develop FedStage DRMAA for LSF:
 
  - GNU autotools (autoconf, automake, libtool),
- - Bison parser generator (www.gnu.org/software/bison)
- - gperf perfect hash function generator (www.gnu.org/software/gperf)
- - Ragel finite state machine compiler (research.cs.queensu.ca/~thurston/ragel)
- - Docutils for processing documentation (docutils.sourceforge.net)
- - LaTeX for creating documentation in PDF format (www.latex-project.org)
- - Doxygen for generating source code documentation (www.stack.nl/~dimitri/doxygen)
+ - Bison parser generator (http://www.gnu.org/software/bison)
+ - gperf perfect hash function generator (http://www.gnu.org/software/gperf)
+ - Ragel finite state machine compiler (http://www.colm.net/open-source/ragel/)
+ - Docutils for processing documentation (http://docutils.sourceforge.net)
+ - LaTeX for creating documentation in PDF format (http://www.latex-project.org)
+ - Doxygen for generating source code documentation (http://www.stack.nl/~dimitri/doxygen)
 
 
 
