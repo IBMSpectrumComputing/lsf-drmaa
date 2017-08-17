@@ -1,0 +1,13 @@
+.deps
+.libs
+*.o
+*.lo
+*.la
+*.log
+autom4te.cache
+Makefile
+stamp-h1
+config.status
+config.h
+libtool
+Doxyfile

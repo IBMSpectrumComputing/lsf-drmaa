@@ -26,9 +26,11 @@ libdrmaa_la_SOURCES = \
  job.c job.h \
  native.c native.h \
  session.c session.h \
- util.c util.h
+ util.c util.h \
+ com_sun_grid_drmaa_SessionImpl.c com_sun_grid_drmaa_SessionImpl.h
 
-libdrmaa_la_CPPFLAGS =  -I$(top_srcdir)/drmaa_utils/ -I$(top_srcdir)/lsd_drmaa @LSF_INCLUDES@
+
+libdrmaa_la_CPPFLAGS =  -I$(top_srcdir)/drmaa_utils/ -I$(top_srcdir)/lsd_drmaa @LSF_INCLUDES@ @JNI_INCLUDES@
 if GCC
   libdrmaa_la_CPPFLAGS += -Wno-long-long
 endif

@@ -214,20 +214,20 @@ lsfdrmaa_job_update_status( fsd_job_t *self )
 			
 						job_in_queue = n_records > 0;
 			
-						if(!job_in_queue){
+			if(!job_in_queue){
 				if(!(self->flags & FSD_JOB_CURRENT_SESSION)){
-									fsd_exc_raise_code( FSD_DRMAA_ERRNO_INVALID_JOB );
-								 }else{/*handling missing job*/
-									 self->on_missing(self);
-								 }
-						}else{
-								job_info = lsb_readjobinfo( &more );
+					fsd_exc_raise_code( FSD_DRMAA_ERRNO_INVALID_JOB );
+				}else{/*handling missing job*/
+					self->on_missing(self);
+				}
+			}else{
+				job_info = lsb_readjobinfo( &more );
 				fsd_log_debug(( "lsb_readjobinfo(...) =%p: more=%d",
 							(void*)job_info, more ));
 				if( job_info == NULL )
 					fsd_exc_raise_lsf( "lsb_readjobinfo" );
 				lsf_self->read_job_info( self, job_info );
-						}
+			}
 		 }
 		FINALLY
 		 {

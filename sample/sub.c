@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     const char * job_argv[2] = {"20", NULL};
     drmaa_job_template_t *jt = NULL;
     char *job_name    = NULL;
-    const char* job_native = "-q normal";
+    const char* job_native = "-q normal -P jacs -W 0:210 -R \"select[haswell]\"";
     char job_id_out[MAX_LEN_JOBID];
     int stat;
     int exited, exit_status, signaled;
@@ -57,7 +57,8 @@ int main(int argc, char *argv[])
                           NULL, 0);
     
     /* the job's native specification */
-   drmaa_set_attribute(jt, DRMAA_NATIVE_SPECIFICATION, job_native, NULL, 0);
+    printf("Native spec: %s \n", job_native);
+    drmaa_set_attribute(jt, DRMAA_NATIVE_SPECIFICATION, job_native, NULL, 0);
 
     /*run a job*/
     drmaa_errno=drmaa_run_job(job_id, 

@@ -211,7 +211,7 @@ fsd_drmaa_session_new( const char *contact )
 		self->pool_delay.tv_sec = 5;
 		self->pool_delay.tv_nsec = 0;
 		self->cache_job_state = 0;
-		self->enable_wait_thread = true;
+		self->enable_wait_thread = false;
 		self->job_categories = NULL;
 		self->missing_jobs_exit_code=1;
 		self->wait_thread_started = false;
@@ -547,7 +547,7 @@ fsd_drmaa_session_wait_for_single_job(
 			fsd_exc_raise_fmt( FSD_DRMAA_ERRNO_INVALID_JOB,
 					"Job '%s' not found in DRMS queue", job_id );
 		
-				if(!self->enable_wait_thread){
+		if(!self->enable_wait_thread){
 			job->update_status( job );
 		}
 		while( !self->destroy_requested  &&  job->state < DRMAA_PS_DONE )
