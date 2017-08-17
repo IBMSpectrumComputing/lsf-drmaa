@@ -1,6 +1,6 @@
 # lsf-drmaa
 
-This is a fork of the original FedStage DRMAA for LSF created in 2008.  It currently has been certified to work on LSF upto version 9.1.2, but likely works with more recent versions.  Community contributions are allows so long as you follow the IBM modified DCO process articulated below and in the IBMDCO.md file within this repository.  We welcome your pull requests.
+This is a fork of the original FedStage DRMAA for LSF created in 2008.  It currently has been certified to work on LSF upto version 9.1.2, but likely works with more recent versions.  Community contributions are allowed so long as you follow the IBM modified DCO process articulated below and in the IBMDCO.md file within this repository.  We welcome your pull requests.
 
 ## Release Information
 
