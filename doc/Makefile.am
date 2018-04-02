@@ -36,9 +36,9 @@ RST2LATEXFLAGS = $(DOCUTILSFLAGS) \
  --use-latex-citations \
  --use-latex-toc
 
-readme.html: $(top_srcdir)/README
+readme.html: $(top_srcdir)/README.md
 	$(RST2HTML) $(RST2HTMLFLAGS) $< $@
-readme.tex: $(top_srcdir)/README
+readme.tex: $(top_srcdir)/README.md
 	$(RST2LATEX) $(RST2LATEXFLAGS) $< $@
 .tex.pdf:
 	pdflatex $< && pdflatex $<
