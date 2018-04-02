@@ -89,6 +89,7 @@ fi
 
 AC_HAVE_LIBRARY([-lnsl], [LSF_LIBS="$LSF_LIBS -lnsl"])
 AC_HAVE_LIBRARY([-lm], [LSF_LIBS="$LSF_LIBS -lm"])
+AC_HAVE_LIBRARY([-lrt], [LSF_LIBS="$LSF_LIBS -lrt"])
 
 CPPFLAGS_save="$CPPFLAGS"
 LDFLAGS_save="$LDFLAGS"
