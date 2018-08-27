@@ -11543,7 +11543,7 @@ $as_echo "$as_me: error: ANSI C compiler is required" >&2;}
 fi
 
 if test x$GCC = xyes; then
-	CFLAGS="-pedantic -ansi ${CFLAGS}"
+	CFLAGS="-pedantic ${CFLAGS}"
 fi
  if test x$GCC = xyes; then
   GCC_TRUE=
