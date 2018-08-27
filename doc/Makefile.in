@@ -414,7 +414,7 @@ readme.html: $(top_srcdir)/README.md
 readme.tex: $(top_srcdir)/README.md
 	$(RST2LATEX) $(RST2LATEXFLAGS) $< $@
 .tex.pdf:
-	pdflatex $< && pdflatex $<
+	-pdflatex $< && -pdflatex $<
 
 clean-local:
 	-rm -rf *.log *.aux *.toc *.out
