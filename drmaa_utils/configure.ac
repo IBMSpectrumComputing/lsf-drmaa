@@ -79,7 +79,7 @@ if test x$ac_cv_prog_cc_stdc = xno; then
 fi
 
 if test x$GCC = xyes; then
-	CFLAGS="-pedantic -ansi ${CFLAGS}"
+	CFLAGS="-pedantic ${CFLAGS}"
 fi
 AM_CONDITIONAL([GCC], [test x$GCC = xyes])
 
