@@ -92,7 +92,7 @@ lsfdrmaa_native_parse( const char *native_spec, struct submit *req )
 		| "'" ([^']* $arg) "'";
 	char = ^(space | ['"]) $arg;
 	argument = char+ | char* (quoted_string char*)+;
-	short_with_arg = ([LcCFWkPGgqRmnJbtuUMDSvfa] | 'i' 's'? | [oe] 'o'?
+	short_with_arg = ([LcCFWkPpGgqRmnJbtuUMDSvfa] | 'i' 's'? | [oe] 'o'?
 		| 'w' [at]? | 'E' 'p'? | 'sp' | 'sla' | 'ext' 'sched'?
 		| 'jsdl' '_strict'? | 'We' | 'cwd' | 'ar')
 		>opt_begin %opt_end;
