@@ -94,7 +94,7 @@ lsfdrmaa_native_parse( const char *native_spec, struct submit *req )
 	argument = char+ | char* (quoted_string char*)+;
 	short_with_arg = ([LcCFWkPGgqRmnJbtuUMDSvfa] | 'i' 's'? | [oe] 'o'?
 		| 'w' [at]? | 'E' 'p'? | 'sp' | 'sla' | 'ext' 'sched'?
-		| 'jsdl' '_strict'? | 'We' | 'cwd' | 'ar')
+		| 'jsdl' '_strict'? | 'We' | 'cwd' | 'ar' | 'app' | 'Lp' )
 		>opt_begin %opt_end;
 	short_without_arg = ([xHNBK] | 'r' 'n'? | 'I' [ps]? | 'Zs')
 		>opt_begin %opt_end;
