@@ -48,6 +48,15 @@ To compile and install the library, go to the main source directory and type:
 
 The library requires LSF version 8.3 or later.  Compatibility with older versions may require some patching.
 
+* tips for running on RHEL8:
+  Make sure libnsl and libtirpc installed, then do below link:
+    - `sudo ln -s /lib64/libnsl.so.2.0.0    /lib64/libnsl.so`
+    - `sudo ln -s /lib64/libtirpc.so.3.0.0  /lib64/libtirpc.so`
+    - edit ./configure file as below before execute it.
+       change line 12117, "ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'"
+       to "ac_link='$CC -ltirpc -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'".
+       There are multiple lines with same content, while line 12117 is the last line of same content in ./configure file.
+
 The following are the ./configure script options:
 
 * -with-lsf-inc LSF_INCLUDE_PATH
