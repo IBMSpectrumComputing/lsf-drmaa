@@ -57,6 +57,9 @@ The library requires LSF version 8.3 or later.  Compatibility with older version
        to "ac_link='$CC -ltirpc -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'".
        There are multiple lines with same content, while line 12117 is the last line of same content in ./configure file.
 
+* tips:
+  If lsf_drmaa/native.rl has been modified to add some new functions, please run "sudo make clean" before running "./configure && make", but this will need ragel being installed on current host. 
+
 The following are the ./configure script options:
 
 * -with-lsf-inc LSF_INCLUDE_PATH
