@@ -776,7 +776,7 @@ const char *argument
 			break;
 			
 			case 'g':  /* -g job_group_name */
-			req->options |= SUB2_JOB_GROUP;
+			req->options2 |= SUB2_JOB_GROUP;
 			ASSIGN_ARG( req->jobGroup );
 			break;
 			
